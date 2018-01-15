@@ -1,0 +1,16 @@
+{
+	"extends": "../tsconfig.json",
+	"compilerOptions": {
+		"baseUrl": ".",
+		"rootDir": ".",
+		"paths": {
+			"@muggle/core": [
+				"../../dist/packages/core"
+			]
+		},
+		"outDir": "../../dist/packages/reconciler"
+	},
+	"files": [
+		"index.ts"
+	]
+}

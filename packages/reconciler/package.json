@@ -1,0 +1,11 @@
+{
+  "name": "@muggle/reconciler",
+  "version": "0.0.0-PLACEHOLDER",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT"
+}

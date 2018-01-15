@@ -1,0 +1,17 @@
+{
+  "name": "perf-perf",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/thebigbrain/perf-perf.git",
+  "author": "thebigbrain <379565986@qq.com>",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "rollup": "^0.53.3",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "typescript": "^2.6.2"
+  },
+  "scripts": {
+    "build": "node ./scripts/rollup/build.js"
+  }
+}
