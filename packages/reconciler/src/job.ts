@@ -40,7 +40,7 @@ export class Job {
   public run (): void {
     this.interrupted_ = false;
     let loop = (timestamp: DOMHighResTimeStamp) => {
-      let word: Work = this.workQueue_.iterator().next();
+      let work: Work = this.workQueue_.iterator().next();
       if(!this.interrupted_) {
         requestAnimationFrame(loop); 
       }
