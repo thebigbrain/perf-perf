@@ -1,10 +1,18 @@
+import { requestAnimationFrame, DOMHighResTimeStamp } from '../../share/utils';
 import { Work } from './work';
 import { Queue } from './queue';
+
+enum JobStatus {
+  INTERRUPTED,
+  DONE
+}
+
 
 export class Job {
 
   private workQueue_: Queue<Work>;
   private current_: Work;
+  private interrupted_: boolean = false;
 
   public constructor () {}
 
@@ -25,6 +33,19 @@ export class Job {
     return this.workQueue_.isEmpty();
   }
 
-  public run (): void {}
+  public interrupt (): void {
+    this.interrupted_ = true;
+  }
+
+  public run (): void {
+    this.interrupted_ = false;
+    let loop = (timestamp: DOMHighResTimeStamp) => {
+      let word: Work = this.workQueue_.iterator().next();
+      if(!this.interrupted_) {
+        requestAnimationFrame(loop); 
+      }
+    }
+    requestAnimationFrame(loop);
+  }
 
 }

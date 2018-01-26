@@ -1,10 +1,10 @@
 export class Queue<T> {
 
-  private queue_: Array<T>;
-  private iterator_: QueueIterator<T>;
+  protected queue_: Array<T>;
+  private iterator_: QueueIterator<T> = new QueueIterator<T>(this);
 
   public add(item: T): void {
-    this.queue_.push(item);
+    this.queue_.unshift(item);
   }
 
   public iterator (): QueueIterator<T> {
@@ -23,13 +23,17 @@ export class Queue<T> {
 
 export class PriorityQueue<T> extends Queue<T> {
   public findHighestPriority (): T {
-    return this.queue()[0];
+    return this.iterator().next();
   }
 }
 
 export class QueueIterator<T> {
 
   private next_: T;
+
+  constructor (queue: Queue<T>) {
+
+  }
 
   next () {
     return this.next_;

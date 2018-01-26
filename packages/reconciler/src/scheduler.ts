@@ -1,14 +1,7 @@
 import { Job } from './job';
 import { PriorityQueue } from './queue';
+import { requestAnimationFrame, requestIdleCallback, IdleDeadline } from '../../share/utils'
 
-declare const window;
-declare type DOMHighResTimeStamp = number;
-declare interface IdleDeadline {
-  didTimeout: boolean;
-  timeRemaining: () => DOMHighResTimeStamp
-};
-
-const requestIdleCallback = window.requestIdleCallback;
 const ScheduleUnit = 10;
 
 export class Scheduler {
@@ -25,15 +18,19 @@ export class Scheduler {
     }
   }
 
-  public run (): void {
+  private startLoop (): void {
     this.handle_ = requestIdleCallback((deadline: IdleDeadline) => {
-      this.run();
+      this.startLoop();
       if (deadline.timeRemaining() > ScheduleUnit) {
         this.schedule();
       }
     }, {
       timeout: 1000
     });
+  }
+
+  public run (): void {
+    this.startLoop();
   }
 
 }
