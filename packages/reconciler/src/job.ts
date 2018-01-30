@@ -1,4 +1,4 @@
-import { requestAnimationFrame, DOMHighResTimeStamp } from '../../share/utils';
+import { requestAnimationFrame, DOMHighResTimeStamp } from './utils';
 import { Work } from './work';
 import { Queue } from './queue';
 

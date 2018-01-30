@@ -1,3 +1,5 @@
+// const MemoryFileSystem = require("memory-fs");
+// const fs = new MemoryFileSystem();
 const fs = require('fs');
 const path = require('path');
 
@@ -12,6 +14,8 @@ const isDir = (p) => {
   let stats = fs.lstatSync(p);
   return stats.isDirectory();
 }
+
+exports.fs = fs;
 
 exports.delFile = (file) => {
   fs.unlinkSync(file);

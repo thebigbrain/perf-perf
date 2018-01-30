@@ -5,7 +5,7 @@
 		"rootDir": ".",
 		"paths": {
 		},
-		"outDir": "../../dist/packages/reconciler"
+		"outDir": "../../dist/packages/share"
 	},
 	"files": [
 		"index.ts"

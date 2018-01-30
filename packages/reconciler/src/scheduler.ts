@@ -1,6 +1,6 @@
 import { Job } from './job';
 import { PriorityQueue } from './queue';
-import { requestAnimationFrame, requestIdleCallback, IdleDeadline } from '../../share/utils'
+import { requestAnimationFrame, requestIdleCallback, IdleDeadline } from './utils';
 
 const ScheduleUnit = 10;
 
