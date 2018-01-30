@@ -1,1 +1,1 @@
-export * from './src/job';
+export * from './src/factory';

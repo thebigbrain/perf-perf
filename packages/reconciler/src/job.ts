@@ -3,49 +3,58 @@ import { Work } from './work';
 import { Queue } from './queue';
 
 enum JobStatus {
+  NONE,
   INTERRUPTED,
   DONE
 }
 
-
 export class Job {
-
   private workQueue_: Queue<Work>;
   private current_: Work;
-  private interrupted_: boolean = false;
+  private status_: JobStatus = JobStatus.NONE;
 
-  public constructor () {}
+  public constructor() { }
 
-  public next (): Work {
+  public next(): Work {
     this.current_ = this.workQueue_.iterator().next();
     return this.current_;
   }
 
-  public current (): Work {
+  public current(): Work {
     return this.current_;
   }
 
-  public add (work: Work): void {
+  public add(work: Work): void {
+    if (this.isEmpty()) return;
     this.workQueue_.add(work);
   }
 
-  public isEmpty (): boolean {
-    return this.workQueue_.isEmpty();
+  public isEmpty(): boolean {
+    return !this.workQueue_ || this.workQueue_.isEmpty();
   }
 
-  public interrupt (): void {
-    this.interrupted_ = true;
+  public interrupt(): void {
+    this.status_ = JobStatus.INTERRUPTED;
   }
 
-  public run (): void {
-    this.interrupted_ = false;
-    let loop = (timestamp: DOMHighResTimeStamp) => {
-      let work: Work = this.workQueue_.iterator().next();
-      if(!this.interrupted_) {
-        requestAnimationFrame(loop); 
+  public run(): void {
+    if (this.status_ === JobStatus.NONE) {
+      let loop = (timestamp: DOMHighResTimeStamp) => {
+        let iter = this.workQueue_.iterator();
+        if (iter.hasNext()) {
+          let work = iter.next();
+          this.current_ = work;
+          work.run();
+          requestAnimationFrame(loop);
+        } else {
+          this.done();
+        }
       }
+      requestAnimationFrame(loop);
     }
-    requestAnimationFrame(loop);
   }
 
+  private done() {
+    this.status_ = JobStatus.DONE;
+  }
 }

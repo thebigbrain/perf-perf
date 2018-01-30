@@ -1,1 +1,3 @@
-export class Work {}
+export interface Work {
+  run (): void;
+}
