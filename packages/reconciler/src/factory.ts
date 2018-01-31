@@ -15,8 +15,4 @@ export function createJob() {
   return new Job();
 }
 
-export function createWork(run: () => void): Work {
-  return { run };
-}
-
 export type Work = Work;

@@ -1,23 +1,22 @@
-import { Job } from './job';
-import { PriorityQueue } from './queue';
-import { requestAnimationFrame, requestIdleCallback, IdleDeadline } from './utils';
+import { Job, JobQueue } from './job';
+import { Iterator } from './iterator';
+import { requestAnimationFrame, requestIdleCallback, IdleDeadline, DEBUG } from './utils';
 
 const ScheduleUnit = 10;
 
 export class Scheduler {
-  private jobQueue_: PriorityQueue<Job>;
+  private jobQueue_: JobQueue;
   private handle_: any = null;
   private started_: boolean = false;
 
   public constructor() {
     this.started_ = false;
+    this.jobQueue_ = new JobQueue();
   }
 
   private schedule(): void {
-    if (!this.jobQueue_.isEmpty()) {
-      let job = this.jobQueue_.findHighestPriority();
-      job.run();
-    }
+    let job = this.jobQueue_.getHighestPriority();
+    if(job) job.run();
   }
 
   private startLoop(): void {
@@ -38,6 +37,6 @@ export class Scheduler {
   }
 
   public addJob(job: Job): void {
-    this.jobQueue_.queue().add(job);
+    this.jobQueue_.add(job);
   }
 }

@@ -10,7 +10,15 @@
 </head>
 <body>
   <script type="text/javascript">
-    console.log(reconciler);
+    let { getScheduler, createJob } = reconciler;
+    let scheduler = getScheduler();
+    scheduler.run();
+    let job = createJob();
+    let work = { run: () => { console.log(new Date()) }};
+    console.log(job.size())
+    job.add(work);
+    scheduler.addJob(job);
+    console.log(job.size())
   </script>
 </body>
 </html>

@@ -1,4 +1,5 @@
 import { Iterator, Container } from './iterator';
+import { DEBUG } from './utils';
 
 const MaxBufferSize = 1000;
 
@@ -39,24 +40,29 @@ export class DynamicQueue<T> extends QueueBase<T> implements Container<T> {
   private start_: number;
   private end_: number;
   private currentSize_: number;
+  private queueState_: Array<boolean>;
   protected queue_: Array<T>;
 
   constructor () {
     super();
     this.queue_ = new Array(MaxBufferSize);
-    this.end_ = this.start_ = this.currentIndex_;
+    this.queueState_ = new Array(MaxBufferSize);
+    this.end_ = this.start_ = this.currentIndex_ = 0;
   }
 
   private getIndex (index: number): number {
-    return index < this.currentSize_ ? this.currentIndex_ + index : -1;
+    return index < this.currentSize_ ? this.start_ + index : -1;
   }
 
   // @override
   public add(item: T): void {
-    this.queue_[this.currentIndex_++] = item;
+    this.queue_[this.currentIndex_] = item;
+    this.queueState_[this.currentIndex_] = true;
+    this.currentIndex_++;
     if (this.currentIndex_ === this.queue_.length) {
       this.currentIndex_ = 0;
     }
+    DEBUG('add job', item, this.currentIndex_);
   }
 
   // @override
@@ -83,33 +89,17 @@ export class DynamicQueue<T> extends QueueBase<T> implements Container<T> {
 
   // @implement
   public get(index: number): T {
-    return this.queue_[this.getIndex(index)];
+    index = this.getIndex(index);
+    let cur = this.queue_[index];
+    if (this.queueState_[index]) {
+      this.queueState_[index] = false;
+      return cur;
+    }
+    return this.queue_[-1];
   }
 
   // @implement
   public size(): number {
     return this.currentSize_;
-  }
-}
-
-export class PriorityQueue<T> {
-  private queue_: DynamicQueue<T>;
-  private iter_: Iterator<T>;
-
-  constructor () {
-    this.queue_ = new DynamicQueue<T>();
-  }
-
-  public queue (): DynamicQueue<T> {
-    return this.queue_;
-  }
-
-  public findHighestPriority(): T {
-    if (!this.iter_) this.iter_ = this.queue_.iterator();
-    return this.iter_.next();
-  }
-
-  public isEmpty(): boolean {
-    return this.queue_.isEmpty();
   }
 }
