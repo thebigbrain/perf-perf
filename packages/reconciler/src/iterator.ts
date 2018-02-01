@@ -11,16 +11,15 @@ export class Iterator<T> {
   constructor(container: any) {
     this.container_ = container;
     this.current_ = 0;
-    this.size_ = this.container_.size();
   }
 
   hasNext(): boolean {
-    return this.current_ < this.size_;
+    return this.current_ < this.container_.size();
   }
 
   next(): T {
     let next = this.container_.get(this.current_);
-    this.current_++;
+    if (next) this.current_++;
     return next;
   }
 }

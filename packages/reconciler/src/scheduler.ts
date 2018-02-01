@@ -32,6 +32,7 @@ export class Scheduler {
 
   public run(): void {
     if (this.started_) return;
+    DEBUG('scheduler started!');
     this.started_ = true;
     this.startLoop();
   }

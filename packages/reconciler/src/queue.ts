@@ -5,13 +5,15 @@ const MaxBufferSize = 1000;
 
 export class QueueBase<T> {
   protected queue_: Array<T> = [];
+  protected iter_: Iterator<T>;
 
   public add(item: T): void {
     this.queue_.push(item);
   }
 
   public iterator(): Iterator<T> {
-    return new Iterator<T>(this);
+    if (!this.iter_) this.iter_ = new Iterator<T>(this);
+    return this.iter_;
   }
 
   public isEmpty(): boolean {

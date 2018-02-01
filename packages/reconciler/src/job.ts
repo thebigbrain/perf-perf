@@ -1,59 +1,78 @@
 import { requestAnimationFrame, DOMHighResTimeStamp, DEBUG } from './utils';
 import { Work } from './work';
 // import { Iterator } from './iterator';
-// import { Queue, DynamicQueue, QueueBase } from './queue';
+import { Queue } from './queue';
 
-enum JobStatus {
+export enum JobStatus {
   NONE,
   INTERRUPTED,
+  RUNNING,
   DONE
 }
 
 export class Job {
-  private workQueue_: Array<Work>;
+  private workQueue_: Queue<Work>;
   private status_: JobStatus;
 
   public constructor() {
     this.status_ = JobStatus.NONE;
-    this.workQueue_ = new Array<Work>();
+    this.workQueue_ = new Queue<Work>();
   }
 
-  public add(work: Work): void {
-    this.workQueue_.push(work);
+  public add(...work: Array<Work>): Job {
+    for (let i = 0; i < work.length; i++) {
+      this.workQueue_.add(work[i]); 
+    }
+    return this;
   }
 
   public size(): number {
-    return this.workQueue_.length;
+    return this.workQueue_.size();
   }
 
-  public interrupt(): void {
+  public status(): JobStatus {
+    return this.status_;
+  }
+
+  public interrupt(): this {
     this.status_ = JobStatus.INTERRUPTED;
+    return this;
   }
 
-  public resume(): void {
+  public resume(): Job {
     this.status_ = JobStatus.NONE;
+    return this;
   }
 
-  public run(): void {
-    DEBUG('run job', this, this.workQueue_);
-    if(this.interrupted()) this.resume();
-    if (this.status_ === JobStatus.NONE) {
+  public run(): Job {
+    DEBUG('run job', this, this.status());
+    if (this.running()) return this;
+    this.status_ = JobStatus.RUNNING;
+    if (this.interrupted()) this.resume();
+    if (!this.done()) {
       let loop = (timestamp: DOMHighResTimeStamp) => {
-        let work = this.workQueue_.shift();
-        DEBUG('run work', work);
+        let iter = this.workQueue_.iterator();
+        let work = iter.next();
         if (work) {
+          DEBUG('run work', work);
           work.run();
-          if(!this.interrupted()) requestAnimationFrame(loop);
+          if (!this.interrupted()) requestAnimationFrame(loop);
         } else {
+          DEBUG('job done', this);
           this.status_ = JobStatus.DONE;
         }
       }
       requestAnimationFrame(loop);
     }
+    return this;
   }
 
-  public interrupted () {
+  public interrupted() {
     return this.status_ === JobStatus.INTERRUPTED;
+  }
+
+  public running() {
+    return this.status_ === JobStatus.RUNNING;
   }
 
   public done(): boolean {
@@ -62,19 +81,20 @@ export class Job {
 }
 
 export class JobQueue {
-  private queue_: Array<Job>;
+  private queue_: Queue<Job>;
   private unfinishedJob_: Job | undefined;
 
-  constructor () {
-    this.queue_ = new Array<Job>();
+  constructor() {
+    this.queue_ = new Queue<Job>();
   }
 
   public getHighestPriority(): Job | undefined {
     let job = this.unfinishedJob_;
+    let iter = this.queue_.iterator();
     if (job) {
-      if(job.done()) job = this.queue_.shift();
+      if (job.done()) job = iter.next();
     } else {
-      job = this.queue_.shift();
+      job = iter.next();
     }
     this.unfinishedJob_ = job;
     return job;
@@ -82,7 +102,6 @@ export class JobQueue {
 
   public add(job: Job) {
     DEBUG('add job', job);
-    this.queue_.push(job);
+    this.queue_.add(job);
   }
 }
-
