@@ -1,3 +1,5 @@
+import { DEBUG } from "./utils";
+
 export interface Container<T> {
   get(index: number): T;
   size(): number;
@@ -19,7 +21,9 @@ export class Iterator<T> {
 
   next(): T {
     let next = this.container_.get(this.current_);
-    if (next) this.current_++;
+    if (next) {
+      this.current_++;
+    }
     return next;
   }
 }

@@ -45,7 +45,6 @@ export class Job {
   }
 
   public run(): Job {
-    DEBUG('run job', this, this.status());
     if (this.running()) return this;
     this.status_ = JobStatus.RUNNING;
     if (this.interrupted()) this.resume();
@@ -54,11 +53,9 @@ export class Job {
         let iter = this.workQueue_.iterator();
         let work = iter.next();
         if (work) {
-          DEBUG('run work', work);
           work.run();
           if (!this.interrupted()) requestAnimationFrame(loop);
         } else {
-          DEBUG('job done', this);
           this.status_ = JobStatus.DONE;
         }
       }
@@ -88,7 +85,7 @@ export class JobQueue {
     this.queue_ = new Queue<Job>();
   }
 
-  public getHighestPriority(): Job | undefined {
+  public next(): Job | undefined {
     let job = this.unfinishedJob_;
     let iter = this.queue_.iterator();
     if (job) {
@@ -101,7 +98,6 @@ export class JobQueue {
   }
 
   public add(job: Job) {
-    DEBUG('add job', job);
     this.queue_.add(job);
   }
 }

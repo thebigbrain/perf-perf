@@ -4,8 +4,12 @@ import { DEBUG } from './utils';
 const MaxBufferSize = 1000;
 
 export class QueueBase<T> {
-  protected queue_: Array<T> = [];
+  protected queue_: Array<T>;
   protected iter_: Iterator<T>;
+
+  constructor () {
+    this.queue_ = new Array<T>();
+  }
 
   public add(item: T): void {
     this.queue_.push(item);

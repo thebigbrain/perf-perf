@@ -11,7 +11,7 @@ export function getScheduler () {
   return schedulerSingleton;
 }
 
-export function createJob() {
+export function createJob(scheduler: Scheduler) {
   return new Job();
 }
 

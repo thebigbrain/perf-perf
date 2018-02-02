@@ -13,10 +13,24 @@
     let { getScheduler, createJob } = reconciler;
     let scheduler = getScheduler();
     scheduler.run();
-    let job = createJob();
-    let work = { run: () => { console.log(new Date()) }};
-    job.add(work);
-    scheduler.addJob(job);
+
+    let loop = () => {
+      setTimeout(() => {
+        let job = generateJob();
+        scheduler.addJob(job);
+        // console.log('now', performance.now())
+        loop();
+      }, 3000);
+    }
+
+    loop();
+
+    function generateJob() {
+      let job = createJob(scheduler);
+      let work = { run: () => { console.log(new Date()) }};
+      job.add(work);
+      return job;
+    }
   </script>
 </body>
 </html>

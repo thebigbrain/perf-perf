@@ -15,29 +15,33 @@ export class Scheduler {
   }
 
   private schedule(): void {
-    let job = this.jobQueue_.getHighestPriority();
-    if(job) job.run();
+    let job = this.jobQueue_.next();
+    if (job) {
+      job.run();
+    } else {
+      this.started_ = false;
+    }
   }
 
   private startLoop(): void {
     this.handle_ = requestIdleCallback((deadline: IdleDeadline) => {
-      this.startLoop();
-      if (deadline.timeRemaining() > ScheduleUnit) {
+      DEBUG(deadline.timeRemaining())
+      while (deadline.timeRemaining() > ScheduleUnit) {
         this.schedule();
+        if (!this.started_) break;
       }
-    }, {
-        timeout: 1000
-      });
+      if (this.started_) this.startLoop();
+    });
   }
 
   public run(): void {
     if (this.started_) return;
-    DEBUG('scheduler started!');
     this.started_ = true;
     this.startLoop();
   }
 
   public addJob(job: Job): void {
     this.jobQueue_.add(job);
+    this.run();
   }
 }
