@@ -1,0 +1,12 @@
+{
+  "name": "examples",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "parcel perf.html"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.5.1"
+  }
+}
