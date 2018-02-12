@@ -13,4 +13,24 @@ export interface IdleDeadline {
   timeRemaining: () => DOMHighResTimeStamp
 };
 
+export const calculateFPS = (cb: (arg: number) => {}) => {
+  let initFpsCounter = 0;
+  let lastTimeStamp = 0;
+  let loop = () => {
+    window.requestAnimationFrame((timestamp: DOMHighResTimeStamp) => {
+      initFpsCounter++;
+      if (lastTimeStamp) {
+        let fps = 1000 / (timestamp - lastTimeStamp);
+        if (cb && initFpsCounter > 3) {
+          initFpsCounter = 0;
+          cb(fps)
+        }
+      }
+      lastTimeStamp = timestamp;
+      loop();
+    });
+  }
+  loop();
+}
+
 export const DEBUG = __DEBUG__ ? console.log.bind(console) : noop;

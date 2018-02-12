@@ -1,5 +1,4 @@
 import { requestAnimationFrame, DOMHighResTimeStamp, DEBUG } from './utils';
-import { Work } from './work';
 // import { Iterator } from './iterator';
 import { Queue } from './queue';
 
@@ -10,72 +9,28 @@ export enum JobStatus {
   DONE
 }
 
-export class Job {
-  private workQueue_: Queue<Work>;
-  private status_: JobStatus;
-
-  public constructor() {
-    this.status_ = JobStatus.NONE;
-    this.workQueue_ = new Queue<Work>();
-  }
-
-  public add(...work: Array<Work>): Job {
-    for (let i = 0; i < work.length; i++) {
-      this.workQueue_.add(work[i]); 
-    }
-    return this;
-  }
-
-  public size(): number {
-    return this.workQueue_.size();
-  }
-
-  public status(): JobStatus {
-    return this.status_;
-  }
-
-  public interrupt(): this {
-    this.status_ = JobStatus.INTERRUPTED;
-    return this;
-  }
-
-  public resume(): Job {
-    this.status_ = JobStatus.NONE;
-    return this;
-  }
-
-  public run(): Job {
-    if (this.running()) return this;
-    this.status_ = JobStatus.RUNNING;
-    if (this.interrupted()) this.resume();
-    if (!this.done()) {
-      let loop = (timestamp: DOMHighResTimeStamp) => {
-        let iter = this.workQueue_.iterator();
-        let work = iter.next();
-        if (work) {
-          work.run();
-          if (!this.interrupted()) requestAnimationFrame(loop);
-        } else {
-          this.status_ = JobStatus.DONE;
-        }
-      }
-      requestAnimationFrame(loop);
-    }
-    return this;
-  }
-
-  public interrupted() {
-    return this.status_ === JobStatus.INTERRUPTED;
-  }
-
-  public running() {
-    return this.status_ === JobStatus.RUNNING;
-  }
-
-  public done(): boolean {
-    return this.status_ === JobStatus.DONE;
-  }
+export enum JobPriority {
+  HIGH,
+  LOW
 }
+
+export interface Job {
+  priority: number;
+  status: JobStatus;
+  procedure: (...args: Array<any>) => any;
+  interrupt(): Job;
+  resume(): Job;
+  run(): Job;
+  done(): boolean;
+}
+
+export class JobBase {
+  
+}
+
+export class IOJob {}
+export class AnimJob {}
+export class NormJob {}
 
 export class JobQueue {
   private queue_: Queue<Job>;

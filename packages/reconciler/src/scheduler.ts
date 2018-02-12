@@ -1,6 +1,6 @@
 import { Job, JobQueue } from './job';
 import { Iterator } from './iterator';
-import { requestAnimationFrame, requestIdleCallback, IdleDeadline, DEBUG } from './utils';
+import { requestAnimationFrame, requestIdleCallback, DOMHighResTimeStamp, DEBUG } from './utils';
 
 const ScheduleUnit = 10;
 
@@ -24,13 +24,11 @@ export class Scheduler {
   }
 
   private startLoop(): void {
-    this.handle_ = requestIdleCallback((deadline: IdleDeadline) => {
-      DEBUG(deadline.timeRemaining())
-      while (deadline.timeRemaining() > ScheduleUnit) {
+    this.handle_ = requestAnimationFrame((timestamp: DOMHighResTimeStamp) => {
+      if (this.started_) {
         this.schedule();
-        if (!this.started_) break;
+        if (this.started_) this.startLoop();
       }
-      if (this.started_) this.startLoop();
     });
   }
 

@@ -1,6 +1,5 @@
 import { Job } from './job';
 import { Scheduler } from './scheduler';
-import { Work } from './work';
 
 let schedulerSingleton: Scheduler | null = null;
 
@@ -11,8 +10,7 @@ export function getScheduler () {
   return schedulerSingleton;
 }
 
-export function createJob(scheduler: Scheduler) {
-  return new Job();
+export function createJob() {
+  let scheduler = getScheduler();
 }
 
-export type Work = Work;
