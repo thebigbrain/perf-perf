@@ -11,6 +11,6 @@ export function getScheduler () {
 }
 
 export function createJob() {
-  let scheduler = getScheduler();
+  
 }
 

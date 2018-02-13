@@ -1,6 +1,8 @@
 import { requestAnimationFrame, DOMHighResTimeStamp, DEBUG } from './utils';
-// import { Iterator } from './iterator';
 import { Queue } from './queue';
+import { Handle } from './handle';
+
+export type func = (...args: Array<any>) => any;
 
 export enum JobStatus {
   NONE,
@@ -9,50 +11,24 @@ export enum JobStatus {
   DONE
 }
 
+export interface JobStats { }
+
 export enum JobPriority {
   HIGH,
   LOW
 }
 
-export interface Job {
-  priority: number;
+export class Job {
+  priority: JobPriority;
   status: JobStatus;
-  procedure: (...args: Array<any>) => any;
-  interrupt(): Job;
-  resume(): Job;
-  run(): Job;
-  done(): boolean;
+  stats: JobStats;
+  procedure: func;
+  deadline: DOMHighResTimeStamp;
+
+  public call () {}
 }
 
-export class JobBase {
-  
-}
+export class IOJob { }
+export class AnimJob { }
+export class NormJob { }
 
-export class IOJob {}
-export class AnimJob {}
-export class NormJob {}
-
-export class JobQueue {
-  private queue_: Queue<Job>;
-  private unfinishedJob_: Job | undefined;
-
-  constructor() {
-    this.queue_ = new Queue<Job>();
-  }
-
-  public next(): Job | undefined {
-    let job = this.unfinishedJob_;
-    let iter = this.queue_.iterator();
-    if (job) {
-      if (job.done()) job = iter.next();
-    } else {
-      job = iter.next();
-    }
-    this.unfinishedJob_ = job;
-    return job;
-  }
-
-  public add(job: Job) {
-    this.queue_.add(job);
-  }
-}
