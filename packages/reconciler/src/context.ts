@@ -16,7 +16,6 @@ export class PriorityList<T> extends List<T> {
       node = node.next;
     }
   }
-  
 }
 
 export class Context {
