@@ -1,4 +1,9 @@
-import { requestAnimationFrame, requestIdleCallback, DOMHighResTimeStamp, DEBUG } from './utils';
+import {
+  requestAnimationFrame,
+  requestIdleCallback,
+  DOMHighResTimeStamp,
+  DEBUG
+} from './utils';
 import { Context } from './context';
 
 const ScheduleUnit = 10;
@@ -18,7 +23,7 @@ export class Scheduler {
 
   private schedule() {
     let job = this.workInProgress.getJob();
-    if(job) {
+    if (job) {
       return job.call();
     }
     this.started_ = false;

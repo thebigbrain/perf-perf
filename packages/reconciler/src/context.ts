@@ -1,29 +1,46 @@
 import { List } from './list';
 import { Job } from './job';
-import { DOMHighResTimeStamp, toInstance } from './utils';
+import {
+  convert,
+  ExpirationTime,
+  now
+} from './utils';
 
 export class PriorityList<T> extends List<T> {
-  priority: DOMHighResTimeStamp;
+  priority: ExpirationTime;
+  head: List<T>;
 
-  insert(k: DOMHighResTimeStamp, n: PriorityList<T>) {
+  constructor() {
+    super();
+    this.head = new List<T>();
+  }
+
+  insert(k: ExpirationTime, n: PriorityList<T>) {
+    let node = this.findNode(k);
+    node.append(n);
+  }
+
+  findNode(k: ExpirationTime) {
     let node = this.head;
-    while(node) {
-      let inst = toInstance<List<T>, PriorityList<T>>(node);
+    while (node) {
+      let inst = convert<List<T>, PriorityList<T>>(node);
       if (k == inst.priority) {
-        node.append(n);
-        break;
+        return node;
       }
-      node = node.next;
+      node = this.next;
     }
+    return node;
   }
 }
 
 export class Context {
-  highQueue: PriorityList<List<Job>>;
-  lowQueue: PriorityList<List<Job>>;
+  highQueue: PriorityList<Job>;
+  lowQueue: PriorityList<Job>;
 
   getJob() {
-    let list = this.highQueue.head || this.lowQueue.head;
-    return list ? list.val.head.val : null;
+    let list = this.highQueue || this.lowQueue;
+    if (!list) return null;
+    let head = list.head;
+    return head ? head.next.val : null;
   }
 }

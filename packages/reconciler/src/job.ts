@@ -19,6 +19,7 @@ export enum JobPriority {
 }
 
 export class Job {
+  owner: any;
   priority: JobPriority;
   status: JobStatus;
   stats: JobStats;

@@ -35,7 +35,11 @@ export const calculateFPS = (cb: (arg: number) => {}) => {
 
 export const DEBUG = __DEBUG__ ? console.log.bind(console) : noop;
 
-export function toInstance<From, To>(inst: From): To {
+export function convert<From, To>(inst: From): To {
   let ret: any = inst;
   return ret;
-};
+}
+
+export const now = () => performance.now();
+
+export type ExpirationTime = number;

@@ -1,7 +1,5 @@
 export class List<T> {
   val: T;
-  head: List<T>;
-  tail: List<T>;
   prev: List<T>;
   next: List<T>;
 
@@ -10,6 +8,11 @@ export class List<T> {
     n.next = this.next;
     this.prev.next = n;
     this.next.prev = n;
+  }
+
+  public unlink() {
+    this.prev.next = this.next;
+    this.next.prev = this.prev;
   }
 }
 
