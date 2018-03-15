@@ -1,35 +1,63 @@
-import { List } from './list';
-import { Job } from './job';
+import { List, createNode, Node, appendBefore, unlink } from './list';
+import { Job, JobTypes, createJob } from './job';
 import {
   convert,
-  ExpirationTime,
-  now
+  now,
+  DEBUG
 } from './utils';
+import { ExpirationTime, msToExpirationTime } from './expiration-time';
 
-export class PriorityList<T> extends List<T> {
+export class WorkList<T> {
   priority: ExpirationTime;
-  head: List<T>;
+  list: List<T>;
+
+  constructor(p: ExpirationTime) {
+    this.priority = p;
+    this.list = new List();
+  }
+}
+
+export class PriorityList<T> {
+  private list: List<WorkList<T>>;
 
   constructor() {
-    super();
-    this.head = new List<T>();
+    this.list = new List();
   }
 
-  insert(k: ExpirationTime, n: PriorityList<T>) {
-    let node = this.findNode(k);
-    node.append(n);
+  public insert(k: number, n: Node<T>) {
+    let tail = this.findListHead(msToExpirationTime(k));
+    if (tail) appendBefore(tail, n);
   }
 
-  findNode(k: ExpirationTime) {
-    let node = this.head;
-    while (node) {
-      let inst = convert<List<T>, PriorityList<T>>(node);
-      if (k == inst.priority) {
-        return node;
+  public head() {
+    return this.list.head;
+  }
+
+  public tail() {
+    return this.list.tail;
+  }
+
+  public isEmpty() {
+    return this.list.isEmpty();
+  }
+
+  private findListHead(k: ExpirationTime): Node<T> | null {
+    let head = this.list.head;
+    let tail = this.list.tail;
+    let node = head.next;
+    while (node !== tail) {
+      if (node.value) {
+        if (k == node.value.priority) {
+          return node.value.list.tail;
+        }
       }
-      node = this.next;
+      node = node.next;
     }
-    return node;
+    if (node == tail) {
+      appendBefore(node, createNode(new WorkList(k)));
+      node = tail.prev;
+    }
+    return node.value ? node.value.list.tail : null;
   }
 }
 
@@ -37,10 +65,48 @@ export class Context {
   highQueue: PriorityList<Job>;
   lowQueue: PriorityList<Job>;
 
-  getJob() {
-    let list = this.highQueue || this.lowQueue;
-    if (!list) return null;
-    let head = list.head;
-    return head ? head.next.val : null;
+  constructor() {
+    this.highQueue = new PriorityList();
+    this.lowQueue = new PriorityList();
+  }
+
+  public getJob() {
+    let queue = this.getWorkInProgress();
+    DEBUG('get job', queue);
+    if (!queue || queue.isEmpty()) return;
+    let head = queue.head();
+    let tail = queue.tail();
+    let node = head.next;
+    if (node === tail) return;
+    if (node.value) {
+      let list = node.value.list;
+      if (list.isEmpty()) return;
+      let n = list.head.next;
+      unlink(n);
+      return n.value;
+    }
+  }
+
+  public add(callback: Function, deadline: number, type: JobTypes) {
+    let job = createJob(callback, type);
+    let queue = this.getJobQueue(type);
+    queue.insert(now() + deadline, new Node(job));
+  }
+
+  private getWorkInProgress(): PriorityList<Job> {
+    return this.highQueue.isEmpty() ? this.lowQueue : this.highQueue;
+  }
+
+  private getJobQueue(type: JobTypes): PriorityList<Job> {
+    let queue: PriorityList<Job>;
+    switch (type) {
+      case JobTypes.NORMAL:
+        queue = this.lowQueue;
+        break;
+      default:
+        queue = this.highQueue;
+        break;
+    }
+    return queue;
   }
 }

@@ -1,6 +1,7 @@
 declare const window: any;
+declare const global: any;
 
-const __DEBUG__ = true;
+const __DEBUG__: boolean = (typeof window !== 'undefined' ? window.__DEBUG__ : global.__DEBUG__) || false;
 
 const noop = () => {};
 
@@ -41,5 +42,3 @@ export function convert<From, To>(inst: From): To {
 }
 
 export const now = () => performance.now();
-
-export type ExpirationTime = number;

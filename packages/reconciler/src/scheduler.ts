@@ -5,8 +5,7 @@ import {
   DEBUG
 } from './utils';
 import { Context } from './context';
-
-const ScheduleUnit = 10;
+import { JobTypes } from './job';
 
 export class Scheduler {
   private started_: boolean = false;
@@ -21,8 +20,16 @@ export class Scheduler {
     return this.workInProgress;
   }
 
+  public add(callback: Function, deadline: number, type: JobTypes) {
+    DEBUG('add a job', type);
+    let context = this.getContext();
+    context.add(callback, deadline, type);
+    this.run();
+  }
+
   private schedule() {
-    let job = this.workInProgress.getJob();
+    let job = this.getContext().getJob();
+    DEBUG('job', job)
     if (job) {
       return job.call();
     }
@@ -30,12 +37,13 @@ export class Scheduler {
   }
 
   private startLoop(): void {
-    requestAnimationFrame((timestamp: DOMHighResTimeStamp) => {
-      if (this.started_) {
+    if (this.started_) {
+      DEBUG('loop started')
+      requestAnimationFrame((timestamp: DOMHighResTimeStamp) => {
         this.schedule();
         if (this.started_) this.startLoop();
-      }
-    });
+      });
+    }
   }
 
   public run(): void {

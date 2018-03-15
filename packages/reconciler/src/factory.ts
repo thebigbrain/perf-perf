@@ -1,16 +1,10 @@
-import { Job } from './job';
+import { Job, JobTypes } from './job';
 import { Scheduler } from './scheduler';
 
-let schedulerSingleton: Scheduler | null = null;
+let scheduler = new Scheduler();
 
-export function getScheduler () {
-  if (schedulerSingleton === null) {
-    schedulerSingleton = new Scheduler();
+export function requestRenderRootJob(cb: Function) {
+  if (cb) {
+    scheduler.add(cb, 100, JobTypes.RENDER);
   }
-  return schedulerSingleton;
 }
-
-export function createJob() {
-  
-}
-

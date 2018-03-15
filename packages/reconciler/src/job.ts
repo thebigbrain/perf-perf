@@ -2,7 +2,7 @@ import { requestAnimationFrame, DOMHighResTimeStamp, DEBUG } from './utils';
 import { Queue } from './queue';
 import { Handle } from './handle';
 
-export type func = (...args: Array<any>) => any;
+const noop = () => {};
 
 export enum JobStatus {
   NONE,
@@ -23,13 +23,37 @@ export class Job {
   priority: JobPriority;
   status: JobStatus;
   stats: JobStats;
-  procedure: func;
+  procedure: Function;
   deadline: DOMHighResTimeStamp;
 
-  public call () {}
+  constructor(fun: Function) {
+    this.procedure = fun || noop;
+  }
+
+  public call () {
+    this.procedure();
+  }
 }
 
-export class IOJob { }
-export class AnimJob { }
-export class NormJob { }
+export class IOJob extends Job { }
+export class AnimationJob extends Job { }
+export class NormalJob extends Job { }
 
+export class RenderJob extends Job {}
+
+export enum JobTypes {
+  RENDER,
+  ANIMATION,
+  IO,
+  NORMAL
+}
+
+export function createJob(fun: Function, type: JobTypes): Job {
+  let job: Job;
+  switch(type) {
+    case JobTypes.RENDER:
+      return new RenderJob(fun);
+    default:
+      return new NormalJob(fun);
+  }
+}
