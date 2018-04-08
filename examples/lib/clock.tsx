@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { Component, createElement, ReactElement } from 'react';
 import HelloWorld from './helloworld';
 
@@ -23,7 +24,7 @@ export default class Clock extends Component<{}, { date: Date }> {
 
   render() {
     return (
-      <div onClick={this.tick} className='hello'>
+      <div onClick={this.tick.bind(this)} className='hello'>
         <HelloWorld/>
         <h2>It is {this.state.date.toLocaleTimeString()}</h2>
       </div>

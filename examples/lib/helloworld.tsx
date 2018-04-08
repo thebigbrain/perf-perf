@@ -1,3 +1,4 @@
+import React = require('react');
 import { Component, createElement } from 'react';
 
 export default class HelloWorld extends Component {
